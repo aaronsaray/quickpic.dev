@@ -1,11 +1,20 @@
 <template>
   <div id="app">
-    <header class="container-fluid">
+    <header class="container-fluid" :class="{ 'has-image': hasImage }">
       <img src="./assets/logo.png" alt="QuickPic" />
+      <a
+        v-if="hasImage"
+        href="#"
+        class="btn btn-danger btn-sm"
+        id="start-over-button"
+        @click="confirmStartOver()"
+      >
+        Start Over
+      </a>
     </header>
     <main class="container-fluid">
       <div class="row">
-        <div class="col">
+        <div v-if="!hasImage" class="col-6">
           <h1>Quickly Edit Your Picture</h1>
           <h2>Edit and touch up your picture just in the browser.</h2>
           <p>
@@ -23,39 +32,11 @@
             one.
           </p>
         </div>
-        <div class="col px-5">
-          <div id="uploader">
-            <h3 class="text-center mb-3">Pick Your Image</h3>
-            <div class="input-group mb-3">
-              <input
-                type="text"
-                class="form-control"
-                placeholder="Enter full URL"
-              />
-              <div class="input-group-append">
-                <button class="btn btn-primary" type="button">
-                  Go
-                </button>
-              </div>
-            </div>
-            <div class="text-center mb-3 text-muted">
-              - or -
-            </div>
-            <div class="input-group mb-3">
-              <div class="custom-file">
-                <input type="file" class="custom-file-input" id="upload-file" />
-                <label class="custom-file-label" for="upload-file"
-                  >Choose file</label
-                >
-              </div>
-            </div>
-            <div class="text-center mb-3 text-muted">
-              - or -
-            </div>
-            <div class="text-center">
-              Drop Your Image Here
-            </div>
-          </div>
+        <div :class="{ 'col-6': !hasImage, 'col-9': hasImage }">
+          <MainImage @has-image="hasImage = true"></MainImage>
+        </div>
+        <div v-if="hasImage" class="col-3">
+          <h3>Tools</h3>
         </div>
       </div>
     </main>
@@ -63,7 +44,11 @@
       <div class="container-fluid">
         <div class="row align-items-center">
           <div class="col">
-            <a href="#"><img src="https://placekitten.com/250/50" alt="Ad"/></a>
+            <a href="https://thedevmanager.com" target="_blank"
+              ><img
+                src="./assets/supportthedevmanager.png"
+                alt="Support by The Dev Manager"
+            /></a>
           </div>
           <div class="col vertical-align-middle">
             &copy; 2019
@@ -75,7 +60,9 @@
             >
           </div>
           <div class="col">
-            <a href="#"><img src="https://placekitten.com/250/50" alt="Ad"/></a>
+            <a href="https://should-i-fire-my-developer.com" target="_blank"
+              ><img src="./assets/supportdeveloper.png" alt="Support by MBF"
+            /></a>
           </div>
         </div>
       </div>
@@ -84,8 +71,29 @@
 </template>
 
 <script>
+import MainImage from "./components/MainImage.vue";
+
 export default {
-  name: "app"
+  name: "app",
+  components: {
+    MainImage
+  },
+  data: function() {
+    return {
+      hasImage: false
+    };
+  },
+  methods: {
+    confirmStartOver() {
+      if (
+        confirm(
+          "Are you sure you want to start over? Any work you've done will be lost."
+        )
+      ) {
+        this.hasImage = false;
+      }
+    }
+  }
 };
 </script>
 
@@ -110,16 +118,28 @@ main {
 }
 
 header {
-  text-align: center;
-  padding: 1rem 0;
+  padding: 16px 0;
+  transition: padding 300ms;
   img {
-    height: 5rem;
+    height: 80px;
+    margin-left: calc(50vw - 40px);
+    transition: all 500ms;
   }
 }
+header.has-image {
+  padding-top: 0;
+  padding-bottom: 2px;
+  img {
+    margin-left: 0;
+    height: 48px;
+  }
+}
+
 footer {
+  margin-top: 1rem;
   background-color: #2e363e;
   color: #aaaaaa;
-  padding: 0.5rem 0;
+  padding: 8px 0;
   text-align: center;
   a,
   a:hover {
@@ -127,9 +147,9 @@ footer {
   }
 }
 
-#uploader {
-  background: #f9f9f9;
-  padding: 1rem;
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+#start-over-button {
+  position: absolute;
+  top: 5px;
+  right: 8px;
 }
 </style>
