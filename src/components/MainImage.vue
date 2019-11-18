@@ -1,15 +1,32 @@
 <template>
   <div>
-    <div v-if="!image" id="uploader">
+    <div v-if="!imageSource" id="uploader">
       <h3 class="text-center mb-3">Pick Your Image</h3>
-      <div class="input-group mb-3">
-        <input type="text" class="form-control" placeholder="Enter full URL" />
-        <div class="input-group-append">
-          <button class="btn btn-primary" type="button">
-            Go
-          </button>
+      <form @submit.prevent="loadImageFromUrl()">
+        <div class="input-group mb-3">
+          <input
+            type="url"
+            class="form-control"
+            placeholder="Enter full URL"
+            v-model="url"
+          />
+          <div class="input-group-append">
+            <button
+              class="btn btn-primary"
+              :class="{ disabled: loadingUrl }"
+              type="submit"
+            >
+              Go
+              <span
+                v-if="loadingUrl"
+                class="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
+            </button>
+          </div>
         </div>
-      </div>
+      </form>
       <div class="text-center mb-3 text-muted">
         - or -
       </div>
@@ -19,6 +36,7 @@
             type="file"
             class="custom-file-input"
             id="upload-file"
+            accept="image/gif, image/jpeg, image/png"
             @change="loadImageFromFile"
           />
           <label class="custom-file-label" for="upload-file">Choose file</label>
@@ -32,7 +50,7 @@
       </div>
     </div>
     <div v-else id="main-image">
-      <img :src="image" />
+      <img :src="imageSource" />
     </div>
   </div>
 </template>
@@ -45,7 +63,9 @@ export default {
   },
   data: function() {
     return {
-      image: null
+      imageSource: null,
+      url: null,
+      loadingUrl: false
     };
   },
 
@@ -54,10 +74,32 @@ export default {
       const file = event.target.files[0];
       const reader = new FileReader();
       reader.onload = e => {
-        this.image = e.target.result;
+        this.imageSource = e.target.result;
         this.emitHasImage();
       };
       reader.readAsDataURL(file);
+    },
+
+    loadImageFromUrl() {
+      this.loadingUrl = true;
+      let image = new Image();
+      let vue = this;
+
+      // make sure it can load
+      image.onload = function() {
+        vue.imageSource = this.src;
+        vue.emitHasImage();
+        this.loadingUrl = false;
+      };
+
+      image.onerror = function() {
+        alert(
+          "That image couldn't be loaded. Please check the URL and try again."
+        );
+        this.loadingUrl = false;
+      };
+
+      image.src = this.url;
     },
 
     emitHasImage() {

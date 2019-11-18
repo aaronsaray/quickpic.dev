@@ -7,7 +7,7 @@
         href="#"
         class="btn btn-danger btn-sm"
         id="start-over-button"
-        @click="confirmStartOver()"
+        @click.prevent="confirmStartOver()"
       >
         Start Over
       </a>
