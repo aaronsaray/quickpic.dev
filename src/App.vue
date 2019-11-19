@@ -1,9 +1,9 @@
 <template>
   <div id="app">
-    <header class="container-fluid" :class="{ 'has-image': hasImage }">
+    <header class="container-fluid" :class="{ 'has-image': sourceImageObject }">
       <img src="./assets/logo.png" alt="QuickPic" />
       <a
-        v-if="hasImage"
+        v-if="sourceImageObject"
         href="#"
         class="btn btn-danger btn-sm"
         id="start-over-button"
@@ -12,29 +12,17 @@
     </header>
     <main class="container-fluid">
       <div class="row">
-        <div v-if="!hasImage" class="col-6">
-          <h1>Quickly Edit Your Picture</h1>
-          <h2>Edit and touch up your picture just in the browser.</h2>
-          <p>
-            Make a meme. Resize or crop your image. Apply filters. Download it
-            immediately, for free. No need to install any software.
-          </p>
-          <p>
-            Need to quickly create an image for Facebook or Instagram? You
-            shouldn't have to download or install software just to quickly edit
-            and paste a new image to your favorite sites. Use QuickPic to do a
-            few quick adjustments to your image and be on your way.
-          </p>
-          <p>
-            Drag and drop your image in, put in a URL for the image, or upload
-            one.
-          </p>
+        <div v-if="!sourceImageObject" class="col-6">
+          <initial-instructions></initial-instructions>
         </div>
-        <div :class="{ 'col-6': !hasImage, 'col-9': hasImage }">
-          <MainImage @has-image="hasImage = true"></MainImage>
+        <div v-if="!sourceImageObject" class="col-6">
+          <image-loader :image.sync="sourceImageObject"></image-loader>
         </div>
-        <div v-if="hasImage" class="col-3">
-          <h3>Tools</h3>
+        <div v-if="sourceImageObject" class="col-9">
+          <main-image :image="sourceImageObject"></main-image>
+        </div>
+        <div v-if="sourceImageObject" class="col-3">
+          <edit-tools></edit-tools>
         </div>
       </div>
     </main>
@@ -66,16 +54,21 @@
 </template>
 
 <script>
-import MainImage from "./components/MainImage.vue";
+import InitialInstructions from "./components/InitialInstructions";
+import ImageLoader from "./components/ImageLoader";
+import MainImage from "./components/MainImage";
+import EditTools from "./components/EditTools";
 
 export default {
-  name: "app",
   components: {
-    MainImage
+    ImageLoader,
+    InitialInstructions,
+    MainImage,
+    EditTools
   },
   data: function() {
     return {
-      hasImage: false
+      sourceImageObject: null
     };
   },
   methods: {
@@ -85,7 +78,7 @@ export default {
           "Are you sure you want to start over? Any work you've done will be lost."
         )
       ) {
-        this.hasImage = false;
+        this.sourceImageObject = null;
       }
     }
   }
