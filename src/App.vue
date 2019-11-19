@@ -8,9 +8,7 @@
         class="btn btn-danger btn-sm"
         id="start-over-button"
         @click.prevent="confirmStartOver()"
-      >
-        Start Over
-      </a>
+      >Start Over</a>
     </header>
     <main class="container-fluid">
       <div class="row">
@@ -44,11 +42,9 @@
       <div class="container-fluid">
         <div class="row align-items-center">
           <div class="col">
-            <a href="https://thedevmanager.com" target="_blank"
-              ><img
-                src="./assets/supportthedevmanager.png"
-                alt="Support by The Dev Manager"
-            /></a>
+            <a href="https://thedevmanager.com" target="_blank">
+              <img src="./assets/supportthedevmanager.png" alt="Support by The Dev Manager" />
+            </a>
           </div>
           <div class="col vertical-align-middle">
             &copy; 2019
@@ -56,13 +52,12 @@
               href="https://morebetterfaster.io"
               target="_blank"
               title="When you need your product developed more, better, faster..."
-              >More Better Faster</a
-            >
+            >More Better Faster</a>
           </div>
           <div class="col">
-            <a href="https://should-i-fire-my-developer.com" target="_blank"
-              ><img src="./assets/supportdeveloper.png" alt="Support by MBF"
-            /></a>
+            <a href="https://should-i-fire-my-developer.com" target="_blank">
+              <img src="./assets/supportdeveloper.png" alt="Support by MBF" />
+            </a>
           </div>
         </div>
       </div>
@@ -141,6 +136,7 @@ footer {
   color: #aaaaaa;
   padding: 8px 0;
   text-align: center;
+  font-size: 10px;
   a,
   a:hover {
     color: #aaaaaa;

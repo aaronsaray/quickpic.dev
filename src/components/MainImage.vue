@@ -1,26 +1,12 @@
 <template>
   <div>
-    <div
-      v-if="!imageSource"
-      id="uploader"
-      :class="{ hovering: hovering }"
-      ref="uploader"
-    >
+    <div v-if="!hasImage" id="uploader" :class="{ hovering: hovering }" ref="uploader">
       <h3 class="text-center mb-3">Pick Your Image</h3>
       <form @submit.prevent="loadImageFromUrl()">
         <div class="input-group mb-3">
-          <input
-            type="url"
-            class="form-control"
-            placeholder="Enter full URL"
-            v-model="url"
-          />
+          <input type="url" class="form-control" placeholder="Enter full URL" v-model="url" />
           <div class="input-group-append">
-            <button
-              class="btn btn-primary"
-              :class="{ disabled: loadingUrl }"
-              type="submit"
-            >
+            <button class="btn btn-primary" :class="{ disabled: loadingUrl }" type="submit">
               Go
               <span
                 v-if="loadingUrl"
@@ -32,9 +18,7 @@
           </div>
         </div>
       </form>
-      <div class="text-center mb-3 text-muted">
-        - or -
-      </div>
+      <div class="text-center mb-3 text-muted">- or -</div>
       <div class="input-group mb-3">
         <div class="custom-file">
           <input
@@ -47,21 +31,15 @@
           <label class="custom-file-label" for="upload-file">Choose file</label>
         </div>
       </div>
-      <div class="text-center mb-3 text-muted">
-        - or -
-      </div>
-      <div class="text-center paste-message mb-3">
-        Paste Image From Clipboard
-      </div>
-      <div class="text-center mb-3 text-muted">
-        - or -
-      </div>
-      <div class="text-center" :class="{ 'font-weight-bold': hovering }">
-        Drop Your Image Here
-      </div>
+      <div class="text-center mb-3 text-muted">- or -</div>
+      <div class="text-center paste-message mb-3">Paste Image From Clipboard</div>
+      <div class="text-center mb-3 text-muted">- or -</div>
+      <div class="text-center" :class="{ 'font-weight-bold': hovering }">Drop Your Image Here</div>
     </div>
-    <div v-else id="main-image">
-      <img :src="imageSource" />
+    <div id="main-image" :class="{'d-none': !hasImage}" ref="main-image">
+      <div class="matte">
+        <canvas ref="canvas" />
+      </div>
     </div>
   </div>
 </template>
@@ -76,7 +54,7 @@ export default {
 
   data: function() {
     return {
-      imageSource: null,
+      hasImage: false,
       url: null,
       loadingUrl: false,
       hovering: false
@@ -93,7 +71,7 @@ export default {
      * This will load an image into the data from a drag and drop
      */
     loadImageFromDrop(event) {
-      if (this.imageSource) {
+      if (this.hasImage) {
         return;
       }
 
@@ -113,8 +91,11 @@ export default {
     loadImageFromFileElement(file) {
       const reader = new FileReader();
       reader.onload = e => {
-        this.imageSource = e.target.result;
-        this.emitHasImage();
+        let image = new Image();
+        image.onload = () => {
+          this.displayLoadedImage(image);
+        };
+        image.src = e.target.result;
       };
       reader.readAsDataURL(file);
     },
@@ -128,16 +109,15 @@ export default {
       let vue = this;
 
       image.onload = function() {
-        vue.imageSource = this.src;
-        vue.emitHasImage();
-        this.loadingUrl = false;
+        vue.displayLoadedImage(this);
+        vue.loadingUrl = false;
       };
 
       image.onerror = function() {
         alert(
           "That image couldn't be loaded. Please check the URL and try again."
         );
-        this.loadingUrl = false;
+        vue.loadingUrl = false;
       };
 
       image.src = this.url;
@@ -147,7 +127,7 @@ export default {
      * processes loading this from a paste
      */
     loadImageFromPaste(event) {
-      if (this.imageSource) {
+      if (this.hasImage) {
         return;
       }
 
@@ -155,9 +135,11 @@ export default {
         i => i.type.indexOf("image") !== -1
       );
       if (itemPaste) {
-        const image = window.URL.createObjectURL(itemPaste.getAsFile());
-        this.imageSource = image;
-        this.emitHasImage();
+        let image = new Image();
+        image.onload = () => {
+          this.displayLoadedImage(image);
+        };
+        image.src = window.URL.createObjectURL(itemPaste.getAsFile());
       } else {
         alert(
           "Could not load an image from your clipboard.  Please make sure it's an image, and not a copy of a file."
@@ -166,10 +148,40 @@ export default {
     },
 
     /**
-     * How we tell the parent we're ready to do the damn thang
+     * Draws image to the canvas
      */
-    emitHasImage() {
-      this.$emit("has-image", true);
+    displayLoadedImage(imageElement) {
+      this.hasImage = true;
+
+      this.$nextTick(() => {
+        const canvas = this.$refs.canvas;
+        const imageContainer = this.$refs["main-image"];
+
+        let imageWidth = imageElement.naturalWidth;
+        let imageHeight = imageElement.naturalHeight;
+        let containerWidth = imageContainer.clientWidth;
+
+        let canvasWidth = imageWidth;
+        let canvasHeight = imageHeight;
+
+        if (imageWidth > containerWidth) {
+          let scale = (containerWidth / imageWidth).toFixed(2);
+          canvasWidth *= scale;
+          canvasHeight *= scale;
+        }
+
+        console.log(imageWidth, canvasWidth);
+
+        canvas.width = canvasWidth;
+        canvas.height = canvasHeight;
+        canvas.imageSmoothingEnabled = false;
+
+        let context = canvas.getContext("2d");
+
+        context.drawImage(imageElement, 0, 0, canvasWidth, canvasHeight);
+
+        this.$emit("has-image", true);
+      });
     },
 
     /**
@@ -235,13 +247,11 @@ export default {
   }
 }
 #main-image {
-  img {
-    display: block;
-    margin: auto;
-    max-width: 100%;
-    height: auto;
-    padding: 10px;
+  display: flex;
+  justify-content: center;
 
+  .matte {
+    padding: 10px;
     background-color: #fefefe;
     background-image: linear-gradient(
         45deg,
@@ -262,7 +272,7 @@ export default {
     -webkit-background-size: 30px 30px;
     -moz-background-size: 30px 30px;
     background-size: 30px 30px;
-    background-position: 0 0, 15px 15px;
+    background-position: -5px -5px, 10px 10px;
   }
 }
 </style>
