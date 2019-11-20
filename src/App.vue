@@ -19,10 +19,10 @@
           <image-loader :image.sync="sourceImageObject"></image-loader>
         </div>
         <div v-if="sourceImageObject" class="col-9">
-          <main-image :image="sourceImageObject"></main-image>
+          <main-image :image="sourceImageObject" @scaled="scale = $event"></main-image>
         </div>
         <div v-if="sourceImageObject" class="col-3">
-          <edit-tools></edit-tools>
+          <edit-tools :scale="scale"></edit-tools>
         </div>
       </div>
     </main>
@@ -68,7 +68,8 @@ export default {
   },
   data: function() {
     return {
-      sourceImageObject: null
+      sourceImageObject: null,
+      scale: 1
     };
   },
   methods: {

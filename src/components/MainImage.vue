@@ -7,9 +7,17 @@
 </template>
 
 <script>
+import EventBus from "../EventBus";
+
 export default {
   props: {
     image: HTMLImageElement
+  },
+
+  created() {
+    EventBus.$on("edit-tools:download", filename =>
+      this.downloadImage(filename)
+    );
   },
 
   mounted() {
@@ -33,6 +41,7 @@ export default {
 
       if (imageWidth > containerWidth) {
         let scale = (containerWidth / imageWidth).toFixed(2);
+        this.$emit("scaled", scale);
         canvasWidth *= scale;
         canvasHeight *= scale;
       }
@@ -43,6 +52,34 @@ export default {
 
       let context = canvas.getContext("2d");
       context.drawImage(this.image, 0, 0, canvasWidth, canvasHeight);
+    },
+
+    /**
+     * Download the edited image
+     * @see https://stackoverflow.com/questions/37135417/download-canvas-as-png-in-fabric-js-giving-network-error/
+     */
+    downloadImage(filename) {
+      const canvas = this.$refs.canvas;
+      let imageData = canvas.toDataURL("image/png");
+
+      const dataURLtoBlob = dataurl => {
+        let arr = dataurl.split(","),
+          mime = arr[0].match(/:(.*?);/)[1],
+          bstr = atob(arr[1]),
+          n = bstr.length,
+          u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], { type: mime });
+      };
+      let imageBlob = dataURLtoBlob(imageData);
+      let objectUrl = URL.createObjectURL(imageBlob);
+
+      let a = document.createElement("a");
+      a.setAttribute("download", filename);
+      a.setAttribute("href", objectUrl);
+      a.click();
     }
   }
 };

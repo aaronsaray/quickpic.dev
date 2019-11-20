@@ -1,6 +1,13 @@
 <template>
   <div>
-    <h3>Tools</h3>
+    <div class="card mb-2">
+      <h5 class="text-center card-header">Details</h5>
+      <div class="card-body">
+        <strong>Zoom:</strong>
+        {{ this.zoomPercentage }}%
+      </div>
+    </div>
+    <hr />
     <div class="card">
       <div class="card-body">
         <form @submit.prevent="handleDownloadRequest()">
@@ -27,12 +34,19 @@
 </template>
 
 <script>
+import EventBus from "../EventBus";
+
 export default {
+  props: {
+    scale: [Number, String]
+  },
+
   data: function() {
     return {
       filename: "quickpic.png"
     };
   },
+
   methods: {
     /**
      * Append PNG if we don't have one, then tell the parent to download it
@@ -43,7 +57,13 @@ export default {
         this.filename += ".png";
       }
 
-      this.$emit("download", this.filename);
+      EventBus.$emit("edit-tools:download", this.filename);
+    }
+  },
+
+  computed: {
+    zoomPercentage() {
+      return this.scale * 100;
     }
   }
 };
