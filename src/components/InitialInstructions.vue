@@ -1,7 +1,7 @@
 <template>
-  <div>
-    <h1>Quickly Edit Your Picture</h1>
-    <h2>Edit and touch up your picture just in the browser.</h2>
+  <div id="instructions">
+    <h1 class="mb-3">Quickly Edit Your Picture</h1>
+    <h2 class="mb-3 text-info sub-head">Edit and touch up your picture just in the browser.</h2>
     <p>
       Make a meme. Resize or crop your image. Apply filters. Download it
       immediately, for free. No need to install any software.
@@ -16,6 +16,18 @@
       Drag and drop your image in, put in a URL for the image, or upload
       one.
     </p>
+    <p
+      class="small"
+    >This is currently a 🚧work-in-progress 🚧 app. (I'm too fancy to say its "under construction" but...) The last update was {{ new Date() }}.</p>
   </div>
 </template>
 
+<style lang="scss">
+#instructions {
+  max-width: 500px;
+  margin: auto;
+}
+h2.sub-head {
+  line-height: 1.3;
+}
+</style>

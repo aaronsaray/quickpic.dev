@@ -91,7 +91,7 @@ export default {
 @import "~bootstrap/scss/variables";
 @import "~bootstrap/scss/mixins";
 
-$body-bg: #efefef;
+$body-bg: #f3f3f3;
 $custom-file-button-bg: $primary;
 $custom-file-button-color: $white;
 
