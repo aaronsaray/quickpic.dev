@@ -14,13 +14,13 @@
           <div class="input-group">
             <input
               type="text"
-              class="form-control"
+              class="form-control form-control-sm"
               placeholder="filename"
               required
               v-model="filename"
             />
             <div class="input-group-append">
-              <button class="btn btn-primary" type="submit">Download</button>
+              <button class="btn btn-primary btn-sm" type="submit">Download</button>
             </div>
           </div>
           <small class="form-text text-muted">
@@ -28,6 +28,14 @@
             <code>.png</code> file
           </small>
         </form>
+        <div class="text-muted text-center small my-2">- or -</div>
+        <div class="text-center">
+          <a
+            href="#"
+            class="btn btn-link btn-sm"
+            @click.prevent="handleOpenInNewTab()"
+          >Open in New Tab</a>
+        </div>
       </div>
     </div>
   </div>
@@ -58,6 +66,13 @@ export default {
       }
 
       EventBus.$emit("edit-tools:download", this.filename);
+    },
+
+    /**
+     * Issues the event that says open this image in a new tab
+     */
+    handleOpenInNewTab() {
+      EventBus.$emit("edit-tools:open-in-new-tab");
     }
   },
 

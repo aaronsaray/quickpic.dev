@@ -1,6 +1,6 @@
 <template>
   <div id="main-image" ref="main-image">
-    <div class="matte">
+    <div class="matte" ref="matte">
       <canvas ref="canvas" />
     </div>
   </div>
@@ -18,6 +18,8 @@ export default {
     EventBus.$on("edit-tools:download", filename =>
       this.downloadImage(filename)
     );
+
+    EventBus.$on("edit-tools:open-in-new-tab", this.openImageInNewTab);
   },
 
   mounted() {
@@ -41,9 +43,11 @@ export default {
 
       if (imageWidth > containerWidth) {
         let scale = (containerWidth / imageWidth).toFixed(2);
+        // then scale it to the lowest 5 increment
+        scale = (Math.floor((scale * 100) / 5) * 5) / 100;
+
         this.$emit("scaled", scale);
-        canvasWidth *= scale;
-        canvasHeight *= scale;
+        this.$refs.matte.style.transform = `scale(${scale})`;
       }
 
       canvas.width = canvasWidth;
@@ -80,6 +84,18 @@ export default {
       a.setAttribute("download", filename);
       a.setAttribute("href", objectUrl);
       a.click();
+    },
+
+    /**
+     * Attempts to open image in new tab
+     */
+    openImageInNewTab() {
+      this.$nextTick(() => {
+        let canvas = this.$refs.canvas;
+        let imageData = canvas.toDataURL("png");
+        let popUp = window.open();
+        popUp.document.write('<img src="' + imageData + '"/>');
+      });
     }
   }
 };
@@ -91,6 +107,8 @@ export default {
   justify-content: center;
 
   .matte {
+    transform-origin: top center;
+
     padding: 10px;
     background-color: #fefefe;
     background-image: linear-gradient(
