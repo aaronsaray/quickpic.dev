@@ -21,7 +21,9 @@ export default {
       scale: 1,
       meme: {
         header: "",
-        footer: ""
+        footer: "",
+        size: 48,
+        padding: 10
       }
     };
   },
@@ -61,6 +63,8 @@ export default {
         this.scale = (Math.floor((this.scale * 100) / 5) * 5) / 100;
 
         this.$refs.matte.style.transform = `scale(${this.scale})`;
+        this.meme.size = 48 / this.scale;
+        this.meme.padding = 10 / this.scale;
       }
 
       canvas.width = canvasWidth;
@@ -74,11 +78,53 @@ export default {
     },
 
     /**
+     * Because we use css for some stuff (or multilayer), we need to build all of this stuff into a duplicate canvas, and then allow
+     * that to be the one that's downloaded/viewed
+     */
+    getCanvasForStorage() {
+      let existingCanvas = this.$refs.canvas;
+
+      const newCanvas = document.createElement("canvas");
+      newCanvas.width = existingCanvas.width;
+      newCanvas.height = existingCanvas.height;
+
+      const contextForDuplication = newCanvas.getContext("2d");
+      contextForDuplication.drawImage(existingCanvas, 0, 0);
+
+      // // if we have a meme, draw it in
+      if (this.meme.header || this.meme.footer) {
+        const contextForMeme = newCanvas.getContext("2d");
+        contextForMeme.font = `${this.meme.size}px Impact, Charcoal, sans-serif`;
+        contextForMeme.textAlign = "center";
+        contextForMeme.fillStyle = "#ffffff";
+        contextForMeme.strokeStyle = "#000000";
+        contextForMeme.lineWidth = 2;
+        const center = newCanvas.width / 2;
+
+        if (this.meme.header) {
+          const top = this.meme.padding;
+          contextForMeme.textBaseline = "top";
+          contextForMeme.fillText(this.meme.header, center, top);
+          contextForMeme.strokeText(this.meme.header, center, top);
+        }
+
+        if (this.meme.footer) {
+          const bottom = newCanvas.height - this.meme.padding;
+          contextForMeme.textBaseline = "bottom";
+          contextForMeme.fillText(this.meme.footer, center, bottom);
+          contextForMeme.strokeText(this.meme.footer, center, bottom);
+        }
+      }
+
+      return newCanvas;
+    },
+
+    /**
      * Download the edited image
      * @see https://stackoverflow.com/questions/37135417/download-canvas-as-png-in-fabric-js-giving-network-error/
      */
     downloadImage(filename) {
-      const canvas = this.$refs.canvas;
+      const canvas = this.getCanvasForStorage();
       let imageData = canvas.toDataURL("image/png");
 
       const dataURLtoBlob = dataurl => {
@@ -106,7 +152,7 @@ export default {
      */
     openImageInNewTab() {
       this.$nextTick(() => {
-        let canvas = this.$refs.canvas;
+        const canvas = this.getCanvasForStorage();
         let imageData = canvas.toDataURL("png");
         let popUp = window.open();
         popUp.document.write('<img src="' + imageData + '"/>');
@@ -124,11 +170,9 @@ export default {
 
   computed: {
     memeStyle() {
-      let size = 48 / this.scale;
-      let padding = 10 / this.scale;
       return {
-        fontSize: `${size}px`,
-        padding: `${padding}px`
+        fontSize: `${this.meme.size}px`,
+        padding: `${this.meme.padding}px`
       };
     }
   }
