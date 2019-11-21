@@ -1,7 +1,7 @@
 <template>
   <div id="main-image" ref="main-image">
     <div class="matte" ref="matte">
-      <canvas ref="canvas" />
+      <canvas ref="canvas">Canvas support is required to use this website.</canvas>
     </div>
   </div>
 </template>

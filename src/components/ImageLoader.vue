@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div id="uploader" :class="{ hovering: hovering }" ref="uploader">
+    <div v-if="canvasSupported" id="uploader" :class="{ hovering: hovering }" ref="uploader">
       <h3 class="text-center mb-3">Pick Your Image</h3>
       <form @submit.prevent="loadImageFromUrl()">
         <div class="input-group mb-3">
@@ -43,6 +43,12 @@
       <div class="text-center mb-3 text-muted">- or -</div>
       <div class="text-center" :class="{ 'font-weight-bold': hovering }">Drop Your Image Here</div>
     </div>
+    <div v-else>
+      <div class="alert alert-danger text-center">
+        To use this website, your browser must support the
+        <code>canvas</code> element.
+      </div>
+    </div>
   </div>
 </template>
 
@@ -57,16 +63,27 @@ export default {
       url: null,
       loadingUrl: false,
       hovering: false,
-      textInput: false
+      textInput: false,
+      canvasSupported: true
     };
   },
 
   mounted() {
-    this.initDragAndDrop();
-    this.initPaste();
+    if ((this.canvasSupported = this.isCanvasSupported())) {
+      this.initDragAndDrop();
+      this.initPaste();
+    }
   },
 
   methods: {
+    /**
+     * Checks to see if canvas is supported in this browser
+     */
+    isCanvasSupported() {
+      let c = document.createElement("canvas");
+      return !!(c.getContext && c.getContext("2d"));
+    },
+
     /**
      * This will load an image into the data from a drag and drop
      */
