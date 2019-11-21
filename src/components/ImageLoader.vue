@@ -4,7 +4,14 @@
       <h3 class="text-center mb-3">Pick Your Image</h3>
       <form @submit.prevent="loadImageFromUrl()">
         <div class="input-group mb-3">
-          <input type="url" class="form-control" placeholder="Enter full URL" v-model="url" />
+          <input
+            type="url"
+            class="form-control"
+            placeholder="Enter full URL"
+            v-model="url"
+            @focus="textInput = true"
+            @blur="textInput = false"
+          />
           <div class="input-group-append">
             <button class="btn btn-primary" :class="{ disabled: loadingUrl }" type="submit">
               Go
@@ -49,7 +56,8 @@ export default {
     return {
       url: null,
       loadingUrl: false,
-      hovering: false
+      hovering: false,
+      textInput: false
     };
   },
 
@@ -115,6 +123,10 @@ export default {
      * processes loading this from a paste
      */
     loadImageFromPaste(event) {
+      if (this.textInput) {
+        return;
+      }
+
       const itemPaste = [...event.clipboardData.items].find(
         i => i.type.indexOf("image") !== -1
       );
