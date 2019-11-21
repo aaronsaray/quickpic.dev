@@ -1,15 +1,38 @@
 <template>
   <div>
     <div class="card mb-2">
-      <h5 class="text-center card-header">Details</h5>
-      <div class="card-body">
+      <h6 class="text-center card-header p-2">Details</h6>
+      <div class="card-body small p-2">
         <strong>Zoom:</strong>
         {{ this.zoomPercentage }}%
       </div>
     </div>
     <hr />
+    <div class="card mb-2">
+      <h6 class="text-center card-header p-2">Tools</h6>
+      <div class="card-body small p-2">
+        <h6>Meme</h6>
+        <input
+          type="text"
+          class="form-control form-control-sm mb-2"
+          placeholder="Type header"
+          v-model="meme.header"
+          @keyup="handleMeme('header')"
+          @change="handleMeme('header')"
+        />
+        <input
+          type="text"
+          class="form-control form-control-sm"
+          placeholder="Type footer"
+          v-model="meme.footer"
+          @keyup="handleMeme()"
+          @change="handleMeme()"
+        />
+      </div>
+    </div>
+    <hr />
     <div class="card">
-      <div class="card-body">
+      <div class="card-body pb-2">
         <form @submit.prevent="handleDownloadRequest()">
           <div class="input-group">
             <input
@@ -51,7 +74,11 @@ export default {
 
   data: function() {
     return {
-      filename: "quickpic.png"
+      filename: "quickpic.png",
+      meme: {
+        header: "",
+        footer: ""
+      }
     };
   },
 
@@ -73,6 +100,10 @@ export default {
      */
     handleOpenInNewTab() {
       EventBus.$emit("edit-tools:open-in-new-tab");
+    },
+
+    handleMeme() {
+      EventBus.$emit("edit-tools:meme", this.meme);
     }
   },
 

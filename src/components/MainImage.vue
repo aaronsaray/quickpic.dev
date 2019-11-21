@@ -2,6 +2,8 @@
   <div id="main-image" ref="main-image">
     <div class="matte" ref="matte">
       <canvas ref="canvas">Canvas support is required to use this website.</canvas>
+      <span id="meme-header" v-bind:style="memeStyle">{{ this.meme.header }}</span>
+      <span id="meme-footer" v-bind:style="memeStyle">{{ this.meme.footer }}</span>
     </div>
   </div>
 </template>
@@ -14,12 +16,24 @@ export default {
     image: HTMLImageElement
   },
 
+  data: function() {
+    return {
+      scale: 1,
+      meme: {
+        header: "",
+        footer: ""
+      }
+    };
+  },
+
   created() {
     EventBus.$on("edit-tools:download", filename =>
       this.downloadImage(filename)
     );
 
     EventBus.$on("edit-tools:open-in-new-tab", this.openImageInNewTab);
+
+    EventBus.$on("edit-tools:meme", this.applyMeme);
   },
 
   mounted() {
@@ -42,17 +56,18 @@ export default {
       let canvasHeight = imageHeight;
 
       if (imageWidth > containerWidth) {
-        let scale = (containerWidth / imageWidth).toFixed(2);
+        this.scale = (containerWidth / imageWidth).toFixed(2);
         // then scale it to the lowest 5 increment
-        scale = (Math.floor((scale * 100) / 5) * 5) / 100;
+        this.scale = (Math.floor((this.scale * 100) / 5) * 5) / 100;
 
-        this.$emit("scaled", scale);
-        this.$refs.matte.style.transform = `scale(${scale})`;
+        this.$refs.matte.style.transform = `scale(${this.scale})`;
       }
 
       canvas.width = canvasWidth;
       canvas.height = canvasHeight;
       canvas.imageSmoothingEnabled = false;
+
+      this.$emit("scaled", this.scale);
 
       let context = canvas.getContext("2d");
       context.drawImage(this.image, 0, 0, canvasWidth, canvasHeight);
@@ -96,6 +111,25 @@ export default {
         let popUp = window.open();
         popUp.document.write('<img src="' + imageData + '"/>');
       });
+    },
+
+    /**
+     * Apply meme from the tools
+     */
+    applyMeme(meme) {
+      this.meme.header = meme.header.toUpperCase();
+      this.meme.footer = meme.footer.toUpperCase();
+    }
+  },
+
+  computed: {
+    memeStyle() {
+      let size = 48 / this.scale;
+      let padding = 10 / this.scale;
+      return {
+        fontSize: `${size}px`,
+        padding: `${padding}px`
+      };
     }
   }
 };
@@ -107,6 +141,7 @@ export default {
   justify-content: center;
 
   .matte {
+    position: relative;
     transform-origin: top center;
 
     padding: 10px;
@@ -132,5 +167,27 @@ export default {
     background-size: 30px 30px;
     background-position: -5px -5px, 10px 10px;
   }
+}
+#meme-header,
+#meme-footer {
+  display: block;
+  position: absolute;
+  left: 0;
+  text-align: center;
+  width: 100%;
+  color: white;
+  text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000,
+    2px 2px 0 #000;
+  font-family: Impact, Charcoal, sans-serif;
+
+  // these will be altered
+  padding: 10px;
+  font-size: 48px;
+}
+#meme-header {
+  top: 0px;
+}
+#meme-footer {
+  bottom: 0px;
 }
 </style>
