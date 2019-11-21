@@ -16,9 +16,11 @@
       Drag and drop your image in, put in a URL for the image, or upload
       one.
     </p>
-    <p
-      class="small"
-    >This is currently a 🚧work-in-progress 🚧 app. (I'm too fancy to say its "under construction" but...) The last update was {{ new Date() }}.</p>
+    <p class="small">
+      This is currently a 🚧work-in-progress 🚧 app &amp; mainly a hobby. (I'm too fancy to say its "under construction")
+      <br />
+      <span class="small">The last update was {{ new Date() }}.</span>
+    </p>
   </div>
 </template>
 
