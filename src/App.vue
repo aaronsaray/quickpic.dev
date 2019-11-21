@@ -11,6 +11,9 @@
       >Start Over</a>
     </header>
     <main class="container-fluid">
+      <div
+        class="d-md-none alert alert-warning text-center"
+      >For optimimal performance, please use this a larger size browser.</div>
       <div class="row">
         <div v-if="!sourceImageObject" class="col-6">
           <initial-instructions></initial-instructions>
