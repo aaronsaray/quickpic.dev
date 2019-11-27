@@ -13,7 +13,7 @@
     <main class="container-fluid">
       <div
         class="d-md-none alert alert-warning text-center"
-      >For optimimal performance, please use this a larger size browser.</div>
+      >For optimimal performance, please use this in a larger size browser.</div>
       <div class="row">
         <div v-if="!sourceImageObject" class="col-6">
           <initial-instructions></initial-instructions>
