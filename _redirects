@@ -2,3 +2,6 @@
 
 # Redirect default Netlify subdomain to primary domain
 https://quickpicdev.netlify.com/* https://quickpic.dev/:splat 301!
+
+# Redirect default Netlify subdomain to primary domain
+https://quickpicdev.netlify.app/* https://quickpic.dev/:splat 301!
