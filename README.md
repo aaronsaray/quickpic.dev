@@ -1,3 +1,5 @@
+> This project has been archived and is no longer supported.  See [this blog entry](https://www.aaronsaray.com/2020/the-end-of-quickpic) for more details.
+
 # quickpic
 
 ## Project setup
